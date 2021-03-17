@@ -1,0 +1,94 @@
+<style>
+.square {
+    background-color: rgb(75, 75, 216);
+    border-image-width: 0;
+}
+
+button {
+ text-align: center;
+ display: block;
+ margin-left: auto;
+ margin-right: auto;
+ margin-bottom: 10px;
+}
+
+#mainDiv {
+    position: fixed;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}
+
+#gridDiv {
+    height:900px;
+    width:900px;
+    row-gap: 0px;
+    column-gap:0px;
+    
+}
+
+</style>
+<html>
+<head>
+</head>
+<body>
+
+<script>
+let mainDiv = document.createElement('div')
+
+mainDiv.setAttribute('id','mainDiv')
+document.querySelector("body").prepend(mainDiv);
+
+let gridDiv = document.createElement('div')
+
+gridDiv.setAttribute('id','gridDiv')
+document.getElementById("mainDiv").prepend(gridDiv);
+
+
+
+
+let squares = gridDiv.children
+
+
+
+gridDiv.style.display="grid"
+
+let button = document.createElement('button')
+button.textContent = "Clear grid"
+document.getElementById("mainDiv").prepend(button)
+//console.log(squares)
+function generateGrid() {
+    let gridSide = prompt("enter number of squares per side of grid")
+    if (isNaN(gridSide)||!Number.isInteger(Number(gridSide))||gridSide<=0) {
+        alert("please enter a positive integer")
+        console.log(gridSide)
+        console.log(isNaN(gridSide))
+        console.log(!Number.isInteger(gridSide))
+        console.log(gridSide<0)
+    }
+
+    else {
+        gridDiv.style.gridTemplateColumns=`repeat(${gridSide}, 1fr)`;
+        gridDiv.style.gridTemplateRows=`repeat(${gridSide}, 1fr)`;
+        for (i=0;i<gridSide*gridSide;i++){
+            let div = document.createElement('div');
+            document.getElementById('gridDiv').appendChild(div);
+            //console.log(`added div number ${i+1}`);
+        }
+
+        for (i=0;i<squares.length;i++){
+        squares[i].classList.add('square');
+        squares[i].addEventListener('mouseenter',(e)=>{
+            //console.log(e)
+            event.target.style.backgroundColor="black"
+           })
+        }
+    }
+}
+button.addEventListener('click', generateGrid)
+generateGrid()
+</script>
+</body>
+
+</html>
