@@ -1,7 +1,12 @@
 <style>
 .square {
-    background-color: rgb(75, 75, 216);
+    background-color:black;
+    opacity: 0;
     border-image-width: 0;
+}
+
+body {
+    background-color:blanchedalmond;
 }
 
 button {
@@ -13,37 +18,42 @@ button {
 }
 
 #mainDiv {
-    position: fixed;
-  top: 50%;
-  left: 50%;
-  /* bring your own prefixes */
-  transform: translate(-50%, -50%);
+    margin: 0 auto;
+    width: 1000px;
 }
 
 #gridDiv {
-    height:900px;
-    width:900px;
+    display: grid;
+    height:800px;
+    width:800px;
     row-gap: 0px;
     column-gap:0px;
-    
+    box-sizing:initial;
+    background-color:white;
 }
 
 </style>
 <html>
 <head>
+    <title>Etch-a-Sketch</title>
+    
 </head>
 <body>
-
+<h1>Etch-a-Sketch</h1>
+<div id="mainDiv">
+    <div id="gridDiv"></div>
+    <button id="clear">Clear grid</button>
+</div>
 <script>
-let mainDiv = document.createElement('div')
+//let mainDiv = document.createElement('div')
 
-mainDiv.setAttribute('id','mainDiv')
-document.querySelector("body").prepend(mainDiv);
+//mainDiv.setAttribute('id','mainDiv')
+//document.querySelector("body").prepend(mainDiv);
 
-let gridDiv = document.createElement('div')
+//let gridDiv = document.createElement('div')
 
-gridDiv.setAttribute('id','gridDiv')
-document.getElementById("mainDiv").prepend(gridDiv);
+//gridDiv.setAttribute('id','gridDiv')
+//document.getElementById("mainDiv").prepend(gridDiv);
 
 
 
@@ -51,23 +61,30 @@ document.getElementById("mainDiv").prepend(gridDiv);
 let squares = gridDiv.children
 
 
+let button = document.getElementById("clear")
+//gridDiv.style.display="grid"
 
-gridDiv.style.display="grid"
-
-let button = document.createElement('button')
-button.textContent = "Clear grid"
-document.getElementById("mainDiv").prepend(button)
+//let button = document.createElement('button')
+//button.textContent = "Clear grid"
+//document.getElementById("mainDiv").prepend(button)
 //console.log(squares)
 function generateGrid() {
     let gridSide = prompt("enter number of squares per side of grid")
-    if (isNaN(gridSide)||!Number.isInteger(Number(gridSide))||gridSide<=0) {
-        alert("please enter a positive integer")
+
+    for (i=0;i<squares.length;i++){
+        squares[i].style.opacity='0'
+        }
+    
+
+    
+    if (isNaN(gridSide)||!Number.isInteger(Number(gridSide))||gridSide<=0||gridSide>=100) {
+        alert("please enter a positive integer under 100")
         console.log(gridSide)
         console.log(isNaN(gridSide))
         console.log(!Number.isInteger(gridSide))
         console.log(gridSide<0)
     }
-
+    
     else {
         gridDiv.style.gridTemplateColumns=`repeat(${gridSide}, 1fr)`;
         gridDiv.style.gridTemplateRows=`repeat(${gridSide}, 1fr)`;
@@ -79,9 +96,12 @@ function generateGrid() {
 
         for (i=0;i<squares.length;i++){
         squares[i].classList.add('square');
-        squares[i].addEventListener('mouseenter',(e)=>{
-            //console.log(e)
-            event.target.style.backgroundColor="black"
+        squares[i].addEventListener('mousemove',(e)=>{
+            //random color
+            //event.target.style.backgroundColor=`rgb(${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)})` 
+            
+            event.target.style.opacity=Number(event.target.style.opacity)+Number('0.15');
+  
            })
         }
     }
