@@ -1,4 +1,5 @@
 <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
 <style>
 h1 {
     font-family: 'Lobster';
@@ -39,35 +40,72 @@ body {
 
 #gridDiv {
     display: grid;
-    height:600px;
-    width:800px;
+    height:500px;
+    width:600px;
     row-gap: 0px;
     column-gap:0px;
     box-sizing:initial;
     background-color:white;
 }
 
-#buttons-one{
+#buttons-one {
     width:80%;
     display:flex;
     justify-content:space-between;
-    margin-top:15px;
+    margin-top:35px;
     align-items:center;
-    margin-bottom:15px;
+    
+    
 }
-
-
-#choose{
-    width:15px;
-    height:20px;
+#buttons-two{
+    width:80%;
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:45px;
+    align-items:flex-start;
+    
+}
+input::-webkit-color-swatch {
     border: none;
-    padding: 0;
 }
-
+#choose{
+    /*position this on the button!*/
+    
+    outline:none;
+    border-radius: 15px;
+    width:130px;
+    height:30px;
+    background-color:black;
+    padding: 2px;
+    border:none;
+    color:white;
+    
+}
+p{
+    color:white;
+}
 button {
     border-radius: 15px;
-    width:110px;
+    width:130px;
     height:30px;
+    outline:none;
+    border:none;
+    background-color:WHITE;
+    font-family: Chango;
+}
+
+.fake{
+    visibility: hidden;
+    
+}
+
+.buttonlabel{
+ background-color: rgb(160, 0, 0); 
+ border:none;
+ color:white;
+ 
+ font-family: Chango;
+ font-size:18px;
 }
 
 </style>
@@ -82,12 +120,13 @@ button {
     <h1>Etch-A-Sketch</h1>
     <div id="gridDiv"></div>
     <div id="buttons-one">
-    <button id="randomize">Random colors</button>
-    <button id="clear">Clear grid</button>
-    <button id="resize">Change size</button>
-    <button id="erase">Erase</button>
-    <button><input type="color" id="choose">Choose color</button>
-</div>
+    <button id="randomize"></button>
+    <button id="clear"></button>
+    <button id="resize"></button>
+    <button id="erase"></button>
+    <input  type="color" id="choose"></div>
+    <div id="buttons-two"><button class="buttonlabel">RANDOM</button><button class="buttonlabel">CLEAR</button><button class="buttonlabel">RESIZE</button><button class="buttonlabel">ERASE</button><button class="buttonlabel">COLOR</button></div>
+
 </div>
 
 <script>
@@ -96,6 +135,7 @@ let squares = gridDiv.children
 let clearButton = document.getElementById("clear");
 let randomButton = document.getElementById("randomize");
 let resizeButton = document.getElementById("resize");
+let eraseButton = document.getElementById("erase");
 let gridSide=16;
 function generateGrid() {
     for (i=0;i<squares.length;i++){
@@ -121,9 +161,26 @@ function generateGrid() {
 function increaseOpacity (e) {
     event.target.style.opacity=Number(event.target.style.opacity)+Number('0.15');
 }
+
+function reduceOpacity (e){
+    event.target.style.opacity=Number(event.target.style.opacity)-Number('0.15');
+}
+
 clearButton.addEventListener('click', ()=>{
+    if (isNaN(gridSide)||!Number.isInteger(Number(gridSide))||gridSide<=0||gridSide>=100) {
+        gridSide=16;
+    }
     generateGrid()
 })
+
+eraseButton.addEventListener('click',()=>{  
+    for (i=0;i<squares.length;i++){
+        squares[i].removeEventListener('mousemove',paintWithSelected);
+        squares[i].removeEventListener('mousemove',increaseOpacity);
+        squares[i].addEventListener('mousemove',reduceOpacity);
+        }
+    }
+)
 
 resizeButton.addEventListener('click', ()=>{
     gridSide = prompt("enter number of squares per side of grid")
@@ -133,9 +190,10 @@ resizeButton.addEventListener('click', ()=>{
 randomButton.addEventListener('click', ()=>{
     let fields = document.getElementsByClassName('square');
     for (i=0;i<fields.length;i++){
+        fields[i].removeEventListener('mousemove',reduceOpacity);
         fields[i].removeEventListener('mousemove',paintWithSelected);
-        fields[i].style.backgroundColor=`rgb(${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)})`
-        fields[i].style.opacity=0;
+        fields[i].addEventListener('mousemove',paintWithRandom)
+
     }
 })
 
@@ -143,9 +201,16 @@ let colorInput = document.getElementById("choose")
 
 function pickColor(){
     let fields = document.getElementsByClassName('square'); 
+    colorInput.style.backgroundColor=`${colorInput.value}`
     for (i=0;i<fields.length;i++){      
-        fields[i].addEventListener('mousemove',paintWithSelected)
+        fields[i].removeEventListener('mousemove',reduceOpacity);
+        fields[i].addEventListener('mousemove',increaseOpacity);
+        fields[i].addEventListener('mousemove',paintWithSelected);
     }
+}
+
+function paintWithRandom(e) {
+    event.target.style.backgroundColor=`rgb(${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)})`
 }
 
 function paintWithSelected(e) {
