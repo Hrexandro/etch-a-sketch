@@ -94,6 +94,16 @@ button {
     font-family: Chango;
 }
 
+#clear:active,#resize:active,.pressed{
+    box-shadow: inset 0px 0px 6px #0c0c0c,0px 0px 6px #0c0c0c;
+    background-color: #ffffff;
+}
+
+.pressedcolor {
+    box-shadow: 0px 0px 6px #0c0c0c;
+}
+
+
 .fake{
     visibility: hidden;
     
@@ -120,12 +130,21 @@ button {
     <h1>Etch-A-Sketch</h1>
     <div id="gridDiv"></div>
     <div id="buttons-one">
-    <button id="randomize"></button>
-    <button id="clear"></button>
-    <button id="resize"></button>
-    <button id="erase"></button>
-    <input  type="color" id="choose"></div>
-    <div id="buttons-two"><button class="buttonlabel">RANDOM</button><button class="buttonlabel">CLEAR</button><button class="buttonlabel">RESIZE</button><button class="buttonlabel">ERASE</button><button class="buttonlabel">COLOR</button></div>
+        <button class="realbutton" id="randomize"></button>
+        <button class="realbutton" id="clear"></button>
+        <button class="realbutton" id="resize"></button>
+        <button class="realbutton" id="erase"></button>
+        <input  type="color" id="choose">
+       <!--<input type="checkbox">--> 
+    </div>      
+    <div id="buttons-two">
+        <button class="buttonlabel">RANDOM</button>
+        <button class="buttonlabel">CLEAR</button>
+        <button class="buttonlabel">RESIZE</button>
+        <button class="buttonlabel">ERASE</button>
+        <button class="buttonlabel">COLOR</button>
+       <!-- <button class="buttonlabel">HOVER / CLICK</button>--> 
+    </div>
 
 </div>
 
@@ -142,7 +161,7 @@ function generateGrid() {
         squares[i].style.opacity='0'
         }
     if (isNaN(gridSide)||!Number.isInteger(Number(gridSide))||gridSide<=0||gridSide>=100) {
-        alert("please enter a positive integer under 100")
+        alert("The number should be a positive integer lower than 100.")
     }
     else {
         gridDiv.style.gridTemplateColumns=`repeat(${gridSide}, 1fr)`;
@@ -174,6 +193,8 @@ clearButton.addEventListener('click', ()=>{
 })
 
 eraseButton.addEventListener('click',()=>{  
+    eraseButton.classList.add('pressed');
+    clearButtons('erase')
     for (i=0;i<squares.length;i++){
         squares[i].removeEventListener('mousemove',paintWithSelected);
         squares[i].removeEventListener('mousemove',increaseOpacity);
@@ -181,18 +202,31 @@ eraseButton.addEventListener('click',()=>{
         }
     }
 )
+let buttons = document.getElementsByClassName('realbutton');
+function clearButtons(id){
+    for (i=0; i<buttons.length;i++){
+        if (buttons[i].getAttribute('id') !== `${id}`){
+        buttons[i].classList.remove('pressed');
+        }
+    }
+    if (id !== "choose"){
+        colorInput.classList.remove('pressedcolor')
+    }
+}
 
 resizeButton.addEventListener('click', ()=>{
-    gridSide = prompt("enter number of squares per side of grid")
+    gridSide = prompt("Set number of pixels per side.")
     generateGrid()
 })
 
 randomButton.addEventListener('click', ()=>{
-    let fields = document.getElementsByClassName('square');
-    for (i=0;i<fields.length;i++){
-        fields[i].removeEventListener('mousemove',reduceOpacity);
-        fields[i].removeEventListener('mousemove',paintWithSelected);
-        fields[i].addEventListener('mousemove',paintWithRandom)
+    randomButton.classList.add('pressed');//
+    clearButtons('randomize');//
+    for (i=0;i<squares.length;i++){
+        squares[i].removeEventListener('mousemove',reduceOpacity);
+        squares[i].removeEventListener('mousemove',paintWithSelected);
+        squares[i].addEventListener('mousemove',paintWithRandom)
+        squares[i].addEventListener('mousemove',increaseOpacity);
 
     }
 })
@@ -200,12 +234,13 @@ randomButton.addEventListener('click', ()=>{
 let colorInput = document.getElementById("choose")
 
 function pickColor(){
-    let fields = document.getElementsByClassName('square'); 
+    colorInput.classList.add('pressedcolor');
+    clearButtons('choose');
     colorInput.style.backgroundColor=`${colorInput.value}`
-    for (i=0;i<fields.length;i++){      
-        fields[i].removeEventListener('mousemove',reduceOpacity);
-        fields[i].addEventListener('mousemove',increaseOpacity);
-        fields[i].addEventListener('mousemove',paintWithSelected);
+    for (i=0;i<squares.length;i++){      
+        squares[i].removeEventListener('mousemove',reduceOpacity);
+        squares[i].addEventListener('mousemove',increaseOpacity);
+        squares[i].addEventListener('mousemove',paintWithSelected);
     }
 }
 
