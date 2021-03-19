@@ -246,8 +246,11 @@ eraseButton.addEventListener('click',()=>{
     clearButtons('erase')
     for (i=0;i<squares.length;i++){
         squares[i].removeEventListener('mousemove',paintWithSelected);
+        squares[i].removeEventListener('mousedown',paintWithSelected);
         squares[i].removeEventListener('mousemove',increaseOpacity);
         squares[i].removeEventListener('mousemove',paintWithRandom)
+        squares[i].removeEventListener('mousedown',paintWithRandom);
+        squares[i].removeEventListener('mousedown',increaseOpacity);
         if (document.getElementById("toggle").checked){
             squares[i].addEventListener('mousedown',reduceOpacity);
             squares[i].removeEventListener('mousemove',reduceOpacity);
@@ -303,17 +306,20 @@ function pickColor(){
     clearButtons('choose');
     colorInput.style.backgroundColor=`${colorInput.value}`
     for (i=0;i<squares.length;i++){      
-        squares[i].removeEventListener('mousemove',reduceOpacity);
-        squares[i].addEventListener('mousemove',paintWithSelected);
+        squares[i].removeEventListener('mousemove',reduceOpacity);   
         squares[i].removeEventListener('mousemove',paintWithRandom);
         squares[i].removeEventListener('mousedown',paintWithRandom);
         if (document.getElementById("toggle").checked){
-            squares[i].addEventListener('mousemove',increaseOpacity);
+            squares[i].addEventListener('mousedown',increaseOpacity);
             squares[i].removeEventListener('mousemove',increaseOpacity);
+            squares[i].addEventListener('mousedown',paintWithSelected);
+            squares[i].removeEventListener('mousemove',paintWithSelected);
         }
         else {
-            squares[i].addEventListener('mousedown',increaseOpacityFaster);
-            squares[i].removeEventListener('mousemove',increaseOpacityFaster);
+            squares[i].addEventListener('mousemove',increaseOpacity);
+            squares[i].removeEventListener('mousedown',increaseOpacityFaster);
+            squares[i].addEventListener('mousemove',paintWithSelected);
+            squares[i].removeEventListener('mousedown',paintWithSelected);
         }
     }
 }
@@ -335,7 +341,8 @@ document.getElementById("toggle").addEventListener ('click',()=>{
         for (i=0;i<squares.length;i++){
             squares[i].removeEventListener('mousemove',increaseOpacity);
             squares[i].addEventListener('mousedown',increaseOpacityFaster);
-            squares[i].removeEventListener('mousemove',paintWithRandom)
+            squares[i].removeEventListener('mousemove',paintWithRandom);
+            squares[i].removeEventListener('mousemove',paintWithSelected);
         }
     }
     else {
@@ -354,14 +361,21 @@ generateGrid()
     else {
 
         }
+z tamtego:
+ gridItems[i].addEventListener('mousedown', drawClick);
+    // listen for a mouse over and change colour only if mouse button is pressed
+    gridItems[i].addEventListener('mouseenter', drawClickHover);
 
-
+// draw on the grid when clicked
+function drawClick(e) {
+  // when fill or grab is true do not do anything (a seperate listener is waiting for fill / grab input)
 */
 //to do:
 //remove all other listeners as a single function to stop repetition
 //improve mousedown
 //add comments throughout
 //readme
+
 </script>
 </body>
 
