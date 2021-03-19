@@ -25,17 +25,15 @@ body {
 
 
 #mainDiv {
-    
     display: flex;
     flex-direction: column;
     justify-content:center;
-    align-items: center;
-    
-        width:1200px;
- margin-left: auto;
- margin-right: auto;
-  background-color:rgb(160, 0, 0);
-  border-radius: 15px;
+    align-items: center;    
+    width:1200px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color:rgb(160, 0, 0);
+    border-radius: 15px;
 }
 
 #gridDiv {
@@ -54,8 +52,6 @@ body {
     justify-content:space-between;
     margin-top:35px;
     align-items:center;
-    
-    
 }
 #buttons-two{
     width:80%;
@@ -69,8 +65,6 @@ input::-webkit-color-swatch {
     border: none;
 }
 #choose{
-    /*position this on the button!*/
-    
     outline:none;
     border-radius: 15px;
     width:130px;
@@ -78,8 +72,7 @@ input::-webkit-color-swatch {
     background-color:black;
     padding: 2px;
     border:none;
-    color:white;
-    
+    color:white;  
 }
 p{
     color:white;
@@ -94,6 +87,8 @@ button {
     font-family: Chango;
 }
 
+
+
 #clear:active,#resize:active,.pressed{
     box-shadow: inset 0px 0px 6px #0c0c0c,0px 0px 6px #0c0c0c;
     background-color: #ffffff;
@@ -103,20 +98,60 @@ button {
     box-shadow: 0px 0px 6px #0c0c0c;
 }
 
-
-.fake{
-    visibility: hidden;
-    
-}
-
 .buttonlabel{
  background-color: rgb(160, 0, 0); 
  border:none;
  color:white;
- 
  font-family: Chango;
  font-size:18px;
+ width:130px;
 }
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 130px;
+  height: 30px;
+}
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgb(255, 255, 255);
+  transition: .4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 2px;
+  background-color: rgb(160, 0, 0);
+  transition: .4s;
+}
+input:checked + .slider:before {
+  transform: translateX(97px);
+}
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+.slider.round:before {
+  border-radius: 50%;
+}
+
 
 </style>
 <html>
@@ -135,7 +170,11 @@ button {
         <button class="realbutton" id="resize"></button>
         <button class="realbutton" id="erase"></button>
         <input  type="color" id="choose">
-       <!--<input type="checkbox">--> 
+        <label class="switch">
+            <input id='toggle' type="checkbox">
+            <span class="slider round"></span>
+          </label>
+        </label>
     </div>      
     <div id="buttons-two">
         <button class="buttonlabel">RANDOM</button>
@@ -143,14 +182,13 @@ button {
         <button class="buttonlabel">RESIZE</button>
         <button class="buttonlabel">ERASE</button>
         <button class="buttonlabel">COLOR</button>
-       <!-- <button class="buttonlabel">HOVER / CLICK</button>--> 
+       <button id="hoverclick" class="buttonlabel">hover/click</button>
     </div>
 
 </div>
 
 <script>
 let squares = gridDiv.children
-
 let clearButton = document.getElementById("clear");
 let randomButton = document.getElementById("randomize");
 let resizeButton = document.getElementById("resize");
@@ -170,15 +208,26 @@ function generateGrid() {
             let div = document.createElement('div');
             document.getElementById('gridDiv').appendChild(div);
         }
-
         for (i=0;i<squares.length;i++){
-        squares[i].classList.add('square');
-        squares[i].addEventListener('mousemove',increaseOpacity)
+            squares[i].classList.add('square');
+            if (document.getElementById("toggle").checked){
+                squares[i].addEventListener('mousedown',increaseOpacityFaster);
+                squares[i].removeEventListener('mousemove',increaseOpacity);
+            }
+            else {
+                squares[i].addEventListener('mousemove',increaseOpacity);
+                squares[i].removeEventListener('mousemove',increaseOpacityFaster);
+            }
+        
         }
     }
 }
 function increaseOpacity (e) {
     event.target.style.opacity=Number(event.target.style.opacity)+Number('0.15');
+}
+
+function increaseOpacityFaster (e) {
+    event.target.style.opacity=Number(event.target.style.opacity)+Number('0.33');
 }
 
 function reduceOpacity (e){
@@ -198,7 +247,15 @@ eraseButton.addEventListener('click',()=>{
     for (i=0;i<squares.length;i++){
         squares[i].removeEventListener('mousemove',paintWithSelected);
         squares[i].removeEventListener('mousemove',increaseOpacity);
-        squares[i].addEventListener('mousemove',reduceOpacity);
+        squares[i].removeEventListener('mousemove',paintWithRandom)
+        if (document.getElementById("toggle").checked){
+            squares[i].addEventListener('mousedown',reduceOpacity);
+            squares[i].removeEventListener('mousemove',reduceOpacity);
+        }
+        else {
+            squares[i].addEventListener('mousemove',reduceOpacity);
+            squares[i].removeEventListener('mousedown',reduceOpacity);
+        }
         }
     }
 )
@@ -220,14 +277,22 @@ resizeButton.addEventListener('click', ()=>{
 })
 
 randomButton.addEventListener('click', ()=>{
-    randomButton.classList.add('pressed');//
-    clearButtons('randomize');//
+    randomButton.classList.add('pressed');
+    clearButtons('randomize');
     for (i=0;i<squares.length;i++){
         squares[i].removeEventListener('mousemove',reduceOpacity);
         squares[i].removeEventListener('mousemove',paintWithSelected);
-        squares[i].addEventListener('mousemove',paintWithRandom)
-        squares[i].addEventListener('mousemove',increaseOpacity);
-
+        
+        if (document.getElementById("toggle").checked){
+            squares[i].removeEventListener('mousemove',increaseOpacity);
+            squares[i].addEventListener('mousedown',increaseOpacityFaster);
+            squares[i].addEventListener('mousedown',paintWithRandom);
+        }
+        else {
+            squares[i].addEventListener('mousedown',increaseOpacityFaster);
+            squares[i].removeEventListener('mousemove',increaseOpacityFaster);
+            squares[i].addEventListener('mousemove',paintWithRandom);
+        }
     }
 })
 
@@ -239,8 +304,17 @@ function pickColor(){
     colorInput.style.backgroundColor=`${colorInput.value}`
     for (i=0;i<squares.length;i++){      
         squares[i].removeEventListener('mousemove',reduceOpacity);
-        squares[i].addEventListener('mousemove',increaseOpacity);
         squares[i].addEventListener('mousemove',paintWithSelected);
+        squares[i].removeEventListener('mousemove',paintWithRandom);
+        squares[i].removeEventListener('mousedown',paintWithRandom);
+        if (document.getElementById("toggle").checked){
+            squares[i].addEventListener('mousemove',increaseOpacity);
+            squares[i].removeEventListener('mousemove',increaseOpacity);
+        }
+        else {
+            squares[i].addEventListener('mousedown',increaseOpacityFaster);
+            squares[i].removeEventListener('mousemove',increaseOpacityFaster);
+        }
     }
 }
 
@@ -255,8 +329,39 @@ function paintWithSelected(e) {
 colorInput.addEventListener('input', ()=>{
     pickColor()
 })
-generateGrid()
 
+document.getElementById("toggle").addEventListener ('click',()=>{
+    if (document.getElementById("toggle").checked){
+        for (i=0;i<squares.length;i++){
+            squares[i].removeEventListener('mousemove',increaseOpacity);
+            squares[i].addEventListener('mousedown',increaseOpacityFaster);
+            squares[i].removeEventListener('mousemove',paintWithRandom)
+        }
+    }
+    else {
+        for (i=0;i<squares.length;i++){
+            squares[i].addEventListener('mousemove',increaseOpacity);
+            squares[i].removeEventListener('mousedown',increaseOpacityFaster); 
+            squares[i].removeEventListener('mousedown',paintWithRandom)
+        }
+    }
+})
+generateGrid()
+/*
+    if (document.getElementById("toggle").checked){
+
+    }
+    else {
+
+        }
+
+
+*/
+//to do:
+//remove all other listeners as a single function to stop repetition
+//improve mousedown
+//add comments throughout
+//readme
 </script>
 </body>
 
