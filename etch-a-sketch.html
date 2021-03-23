@@ -6,13 +6,11 @@ h1 {
     font-size:38px;
     color: rgb(197, 160, 104);
 }
-
 .square {
     background-color:black;
     opacity: 0;
     border-image-width: 0;
 }
-
 body {
     background-color:rgb(252, 252, 149);
     text-align:center;
@@ -21,9 +19,6 @@ body {
     justify-content:center;
     align-items: center;
 }
-
-
-
 #mainDiv {
     display: flex;
     flex-direction: column;
@@ -35,7 +30,6 @@ body {
     background-color:rgb(160, 0, 0);
     border-radius: 15px;
 }
-
 #gridDiv {
     display: grid;
     height:500px;
@@ -45,7 +39,6 @@ body {
     box-sizing:initial;
     background-color:white;
 }
-
 #buttons-one {
     width:80%;
     display:flex;
@@ -58,8 +51,7 @@ body {
     display:flex;
     justify-content:space-between;
     margin-bottom:45px;
-    align-items:flex-start;
-    
+    align-items:flex-start;   
 }
 input::-webkit-color-swatch {
     border: none;
@@ -86,9 +78,6 @@ button {
     background-color:WHITE;
     font-family: Chango;
 }
-
-
-
 #clear:active,#resize:active,.pressed{
     box-shadow: inset 0px 0px 6px #0c0c0c,0px 0px 6px #0c0c0c;
     background-color: #ffffff;
@@ -97,7 +86,6 @@ button {
 .pressedcolor {
     box-shadow: 0px 0px 6px #0c0c0c;
 }
-
 .buttonlabel{
  background-color: rgb(160, 0, 0); 
  border:none;
@@ -106,7 +94,6 @@ button {
  font-size:18px;
  width:130px;
 }
-
 /* The switch - the box around the slider */
 .switch {
   position: relative;
@@ -151,16 +138,12 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
-
-
 </style>
 <html>
 <head>
     <title>Etch-a-Sketch</title>
-    
 </head>
 <body>
-
 <div id="mainDiv">
     <h1>Etch-A-Sketch</h1>
     <div id="gridDiv"></div>
@@ -184,9 +167,7 @@ input:checked + .slider:before {
         <button class="buttonlabel">COLOR</button>
        <button id="hoverclick" class="buttonlabel">hover/click</button>
     </div>
-
 </div>
-
 <script>
 let squares = gridDiv.children
 let clearButton = document.getElementById("clear");
@@ -194,8 +175,9 @@ let randomButton = document.getElementById("randomize");
 let resizeButton = document.getElementById("resize");
 let eraseButton = document.getElementById("erase");
 let gridSide=16;
-let trigger = false;
-
+let trigger = false;//the trigger ensures desired painting behavior, when toggle is set on hover, it is true by default
+//when toggle is set on click, it is true during mousedown, so the user can paint while dragging with pressed mouse button,
+//mousemove paints, but only when mousedown also happens, in other case, with only mousedown being set, it would be "1 click - 1 painted square"
 function generateGrid() {
     for (i=0;i<squares.length;i++){
         squares[i].style.opacity='0';
@@ -218,12 +200,11 @@ function generateGrid() {
 }
 function increaseOpacity (e) {
     if (trigger){
-        if (event.target.style.opacity<1.5){
+        if (event.target.style.opacity<1.5){//ensuring it doesn't increase to infinity
             event.target.style.opacity=Number(event.target.style.opacity)+Number('0.15');
         }
     }
 }
-
 function increaseOpacityFaster (e) {
     event.preventDefault();
     if (trigger){
@@ -232,7 +213,6 @@ function increaseOpacityFaster (e) {
             }
         }
 }
-
 function reduceOpacity (e){
     event.preventDefault();
     if (trigger){
@@ -241,14 +221,12 @@ function reduceOpacity (e){
         }
     }
 }
-
-clearButton.addEventListener('click', ()=>{
+clearButton.addEventListener('click', ()=>{//clears the grid of all color, retaining size
     if (isNaN(gridSide)||!Number.isInteger(Number(gridSide))||gridSide<=0||gridSide>=100) {
         gridSide=16;
     }
     generateGrid()
 })
-
 eraseButton.addEventListener('click',()=>{  
     eraseButton.classList.add('pressed');
     clearButtons('erase');
@@ -256,98 +234,60 @@ eraseButton.addEventListener('click',()=>{
     
 })
 let buttons = document.getElementsByClassName('realbutton');
-
-function clearButtons(id){
+function clearButtons(id){//ensures only one button is active at a time, graphically and functionally
     for (i=0; i<buttons.length;i++){
-        if (buttons[i].getAttribute('id') !== `${id}`){
+        if (buttons[i].getAttribute('id') !== `${id}`){//the id that is currently active does not get cleared
             buttons[i].classList.remove('pressed');
         }
         }
-        if (id !== "choose"){
+        if (id !== "choose"){//graphics of the 'color' button work differently
             colorInput.classList.remove('pressedcolor');
         }
 }
-
 resizeButton.addEventListener('click', ()=>{
     gridSide = prompt("Set number of pixels per side.")
     generateGrid()
 })
-
 randomButton.addEventListener('click', ()=>{
     randomButton.classList.add('pressed');
     toggle();
     clearButtons('randomize');
 })
-
 let colorInput = document.getElementById("choose")
-
 function pickColor(){
     colorInput.classList.add('pressedcolor');
     clearButtons('choose');
     colorInput.style.backgroundColor=`${colorInput.value}`
     toggle();
 }
-
+function paintWithSelected(e) {//painting works through simultaneously changing the background color and increasing opacity from default white to the selected color
+    if (trigger){
+        event.target.style.backgroundColor=`${colorInput.value}`;
+    }
+}
 function paintWithRandom(e) {
     if (trigger){
         event.target.style.backgroundColor=`rgb(${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)})`
     }
 }
-
-function paintWithSelected(e) {
-    if (trigger){
-        event.target.style.backgroundColor=`${colorInput.value}`;
-    }
-}
-
 colorInput.addEventListener('input', ()=>{
     pickColor();
 })
-
 document.getElementById("toggle").addEventListener ('click', toggle)
-/*
-document.addEventListener('mousedown', function(){
-    trigger = true;
-});
 
-document.addEventListener('mouseup', function(){
-    trigger = false;
-});
-*/
 function triggerOn(){
     trigger = true;
 }
 function triggerOff(){
     trigger = false;
 }
-
-document.addEventListener('mousedown', triggerOn);
-
-document.addEventListener('mouseup', triggerOff);
-//add trigger condition to all opacity changes
-//add trigger true to hover, set mousedown opacity changes to mousemove
-//transfer triggerOn/Off event listeners to click part of function
-//removeeventlisteners(move)-from click part of function - perhaps not necessary in move?
-//try to remove redundant code
-
-
-/*function clickTrigger(boolean){
-    trigger=boolean;
-}
-document.addEventListener('mousedown', clickTrigger(true))
-
-document.addEventListener('mouseup', clickTrigger(false));
-*/
-function toggle() {
-    if (document.getElementById("toggle").checked){//click
+function toggle() {//checks the settings on all the buttons and sets the events accordingly
+    if (document.getElementById("toggle").checked){//set on click
         trigger = false;
         document.addEventListener('mousedown', triggerOn);
-        document.addEventListener('mouseup', triggerOff);
-        for (i=0;i<squares.length;i++){//remove all non clicked events
+        document.addEventListener('mouseup', triggerOff);//only paint when mouse is pressed
+        for (i=0;i<squares.length;i++){
             squares[i].removeEventListener('mousemove',increaseOpacity);
-            squares[i].removeEventListener('mousemove',reduceOpacity);
-            squares[i].removeEventListener('mousemove',paintWithRandom);
-            squares[i].removeEventListener('mousemove',paintWithSelected);
         }
         if (Array.from(randomButton.classList).includes("pressed")) {
             for (i=0;i<squares.length;i++){
@@ -382,15 +322,12 @@ function toggle() {
             }
         }
     }   
-    else {//hover
+    else {//set on hover
         document.removeEventListener('mousedown', triggerOn);
         document.removeEventListener('mouseup', triggerOff);
-        trigger = true;
+        trigger = true;//trigger is true, ensuring painting on each mousemove event
         for (i=0;i<squares.length;i++){    
-            squares[i].removeEventListener('mousemove',reduceOpacity);
-            squares[i].removeEventListener('mousemove',paintWithSelected);
             squares[i].removeEventListener('mousemove',increaseOpacityFaster); 
-            squares[i].removeEventListener('mousemove',paintWithRandom);
         }
         if (Array.from(randomButton.classList).includes("pressed")) {
             for (i=0;i<squares.length;i++){
@@ -426,7 +363,7 @@ function toggle() {
         }
     }
 }
-generateGrid()
+generateGrid()//starting grid
 </script>
 </body>
 
