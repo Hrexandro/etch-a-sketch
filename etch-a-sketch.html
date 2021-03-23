@@ -194,6 +194,8 @@ let randomButton = document.getElementById("randomize");
 let resizeButton = document.getElementById("resize");
 let eraseButton = document.getElementById("erase");
 let gridSide=16;
+let trigger = false;
+
 function generateGrid() {
     for (i=0;i<squares.length;i++){
         squares[i].style.opacity='0';
@@ -215,20 +217,28 @@ function generateGrid() {
     }
 }
 function increaseOpacity (e) {
-    if (event.target.style.opacity<1.5){
-        event.target.style.opacity=Number(event.target.style.opacity)+Number('0.15');
+    if (trigger){
+        if (event.target.style.opacity<1.5){
+            event.target.style.opacity=Number(event.target.style.opacity)+Number('0.15');
+        }
     }
 }
 
 function increaseOpacityFaster (e) {
-    if (event.target.style.opacity<1.5){
-        event.target.style.opacity=Number(event.target.style.opacity)+Number('0.33');
-    }
+    event.preventDefault();
+    if (trigger){
+            if (event.target.style.opacity<1.5){
+                event.target.style.opacity=Number(event.target.style.opacity)+Number('0.33');
+            }
+        }
 }
 
 function reduceOpacity (e){
-    if (event.target.style.opacity>-0.5){
-        event.target.style.opacity=Number(event.target.style.opacity)-Number('0.33');
+    event.preventDefault();
+    if (trigger){
+        if (event.target.style.opacity>-0.5){
+            event.target.style.opacity=Number(event.target.style.opacity)-Number('0.33');
+        }
     }
 }
 
@@ -241,8 +251,9 @@ clearButton.addEventListener('click', ()=>{
 
 eraseButton.addEventListener('click',()=>{  
     eraseButton.classList.add('pressed');
+    clearButtons('erase');
     toggle();
-    clearButtons('erase')
+    
 })
 let buttons = document.getElementsByClassName('realbutton');
 
@@ -278,22 +289,60 @@ function pickColor(){
 }
 
 function paintWithRandom(e) {
-    event.target.style.backgroundColor=`rgb(${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)})`
+    if (trigger){
+        event.target.style.backgroundColor=`rgb(${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)})`
+    }
 }
 
 function paintWithSelected(e) {
-    event.target.style.backgroundColor=`${colorInput.value}`
+    if (trigger){
+        event.target.style.backgroundColor=`${colorInput.value}`;
+    }
 }
 
 colorInput.addEventListener('input', ()=>{
-    pickColor()
+    pickColor();
 })
 
 document.getElementById("toggle").addEventListener ('click', toggle)
+/*
+document.addEventListener('mousedown', function(){
+    trigger = true;
+});
+
+document.addEventListener('mouseup', function(){
+    trigger = false;
+});
+*/
+function triggerOn(){
+    trigger = true;
+}
+function triggerOff(){
+    trigger = false;
+}
+
+document.addEventListener('mousedown', triggerOn);
+
+document.addEventListener('mouseup', triggerOff);
+//add trigger condition to all opacity changes
+//add trigger true to hover, set mousedown opacity changes to mousemove
+//transfer triggerOn/Off event listeners to click part of function
+//removeeventlisteners(move)-from click part of function - perhaps not necessary in move?
+//try to remove redundant code
 
 
+/*function clickTrigger(boolean){
+    trigger=boolean;
+}
+document.addEventListener('mousedown', clickTrigger(true))
+
+document.addEventListener('mouseup', clickTrigger(false));
+*/
 function toggle() {
     if (document.getElementById("toggle").checked){//click
+        trigger = false;
+        document.addEventListener('mousedown', triggerOn);
+        document.addEventListener('mouseup', triggerOff);
         for (i=0;i<squares.length;i++){//remove all non clicked events
             squares[i].removeEventListener('mousemove',increaseOpacity);
             squares[i].removeEventListener('mousemove',reduceOpacity);
@@ -302,43 +351,46 @@ function toggle() {
         }
         if (Array.from(randomButton.classList).includes("pressed")) {
             for (i=0;i<squares.length;i++){
-                squares[i].addEventListener('mousedown',paintWithRandom);
-                squares[i].addEventListener('mousedown',increaseOpacityFaster);
+                squares[i].addEventListener('mousemove',paintWithRandom);
+                squares[i].addEventListener('mousemove',increaseOpacityFaster);
 
-                squares[i].removeEventListener('mousedown',paintWithSelected);
-                squares[i].removeEventListener('mousedown',reduceOpacity);
+                squares[i].removeEventListener('mousemove',paintWithSelected);
+                squares[i].removeEventListener('mousemove',reduceOpacity);
             }
         }     
         else if (Array.from(eraseButton.classList).includes("pressed")){
             for (i=0;i<squares.length;i++){
-                    squares[i].addEventListener('mousedown',reduceOpacity);
+                    squares[i].addEventListener('mousemove',reduceOpacity);
 
-                    squares[i].removeEventListener('mousedown',paintWithSelected);
-                    squares[i].removeEventListener('mousedown',increaseOpacityFaster); 
-                    squares[i].removeEventListener('mousedown',paintWithRandom);
+                    squares[i].removeEventListener('mousemove',paintWithSelected);
+                    squares[i].removeEventListener('mousemove',increaseOpacityFaster); 
+                    squares[i].removeEventListener('mousemove',paintWithRandom);
             }
         }
         else if (Array.from(colorInput.classList).includes("pressedcolor")){
             for (i=0;i<squares.length;i++){
-                    squares[i].addEventListener('mousedown',paintWithSelected);
-                    squares[i].addEventListener('mousedown',increaseOpacityFaster);
+                    squares[i].addEventListener('mousemove',paintWithSelected);
+                    squares[i].addEventListener('mousemove',increaseOpacityFaster);
 
-                    squares[i].removeEventListener('mousedown',reduceOpacity);
-                    squares[i].removeEventListener('mousedown',paintWithRandom);
+                    squares[i].removeEventListener('mousemove',reduceOpacity);
+                    squares[i].removeEventListener('mousemove',paintWithRandom);
             }
         }
         else {//default - if no option is selected, it increases the opacity, painting the grid black
             for (i=0;i<squares.length;i++){
-                squares[i].addEventListener('mousedown',increaseOpacityFaster);
+                squares[i].addEventListener('mousemove',increaseOpacityFaster);
             }
         }
     }   
     else {//hover
+        document.removeEventListener('mousedown', triggerOn);
+        document.removeEventListener('mouseup', triggerOff);
+        trigger = true;
         for (i=0;i<squares.length;i++){    
-            squares[i].removeEventListener('mousedown',reduceOpacity);
-            squares[i].removeEventListener('mousedown',paintWithSelected);
-            squares[i].removeEventListener('mousedown',increaseOpacityFaster); 
-            squares[i].removeEventListener('mousedown',paintWithRandom);
+            squares[i].removeEventListener('mousemove',reduceOpacity);
+            squares[i].removeEventListener('mousemove',paintWithSelected);
+            squares[i].removeEventListener('mousemove',increaseOpacityFaster); 
+            squares[i].removeEventListener('mousemove',paintWithRandom);
         }
         if (Array.from(randomButton.classList).includes("pressed")) {
             for (i=0;i<squares.length;i++){
