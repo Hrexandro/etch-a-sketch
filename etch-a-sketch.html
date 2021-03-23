@@ -196,7 +196,7 @@ let eraseButton = document.getElementById("erase");
 let gridSide=16;
 function generateGrid() {
     for (i=0;i<squares.length;i++){
-        squares[i].style.opacity='0'
+        squares[i].style.opacity='0';
         }
     if (isNaN(gridSide)||!Number.isInteger(Number(gridSide))||gridSide<=0||gridSide>=100) {
         alert("The number should be a positive integer lower than 100.")
@@ -210,16 +210,8 @@ function generateGrid() {
         }
         for (i=0;i<squares.length;i++){
             squares[i].classList.add('square');
-            if (document.getElementById("toggle").checked){
-                squares[i].addEventListener('mousedown',increaseOpacityFaster);
-                squares[i].removeEventListener('mousemove',increaseOpacity);
-            }
-            else {
-                squares[i].addEventListener('mousemove',increaseOpacity);
-                squares[i].removeEventListener('mousemove',increaseOpacityFaster);
-            }
-        
         }
+        toggle();
     }
 }
 function increaseOpacity (e) {
@@ -368,6 +360,11 @@ function toggle() {
                     squares[i].addEventListener('mousedown',increaseOpacityFaster);
             }
         }
+        else {
+            for (i=0;i<squares.length;i++){
+                squares[i].addEventListener('mousedown',increaseOpacityFaster);
+            }
+        }
     }   
     else {//hover
         for (i=0;i<squares.length;i++){    
@@ -390,6 +387,11 @@ function toggle() {
         else if (Array.from(colorInput.classList).includes("pressedcolor")){
             for (i=0;i<squares.length;i++){
                 squares[i].addEventListener('mousemove',paintWithSelected);
+                squares[i].addEventListener('mousemove',increaseOpacity);
+            }
+        }
+        else {
+            for (i=0;i<squares.length;i++){
                 squares[i].addEventListener('mousemove',increaseOpacity);
             }
         }
