@@ -215,15 +215,21 @@ function generateGrid() {
     }
 }
 function increaseOpacity (e) {
-    event.target.style.opacity=Number(event.target.style.opacity)+Number('0.15');
+    if (event.target.style.opacity<1.5){
+        event.target.style.opacity=Number(event.target.style.opacity)+Number('0.15');
+    }
 }
 
 function increaseOpacityFaster (e) {
-    event.target.style.opacity=Number(event.target.style.opacity)+Number('0.33');
+    if (event.target.style.opacity<1.5){
+        event.target.style.opacity=Number(event.target.style.opacity)+Number('0.33');
+    }
 }
 
 function reduceOpacity (e){
-    event.target.style.opacity=Number(event.target.style.opacity)-Number('0.33');
+    if (event.target.style.opacity>-0.5){
+        event.target.style.opacity=Number(event.target.style.opacity)-Number('0.33');
+    }
 }
 
 clearButton.addEventListener('click', ()=>{
@@ -234,36 +240,21 @@ clearButton.addEventListener('click', ()=>{
 })
 
 eraseButton.addEventListener('click',()=>{  
-    toggle()
     eraseButton.classList.add('pressed');
+    toggle();
     clearButtons('erase')
-    for (i=0;i<squares.length;i++){
-        squares[i].removeEventListener('mousemove',paintWithSelected);
-        squares[i].removeEventListener('mousedown',paintWithSelected);
-        squares[i].removeEventListener('mousemove',increaseOpacity);
-        squares[i].removeEventListener('mousemove',paintWithRandom)
-        squares[i].removeEventListener('mousedown',paintWithRandom);
-        squares[i].removeEventListener('mousedown',increaseOpacityFaster);
-        if (document.getElementById("toggle").checked){
-            squares[i].addEventListener('mousedown',reduceOpacity);
-            squares[i].removeEventListener('mousemove',reduceOpacity);
-        }
-        else {
-            squares[i].addEventListener('mousemove',reduceOpacity);
-            squares[i].removeEventListener('mousedown',reduceOpacity);
-        }
-    }
 })
 let buttons = document.getElementsByClassName('realbutton');
+
 function clearButtons(id){
     for (i=0; i<buttons.length;i++){
         if (buttons[i].getAttribute('id') !== `${id}`){
-        buttons[i].classList.remove('pressed');
+            buttons[i].classList.remove('pressed');
         }
-    }
-    if (id !== "choose"){
-        colorInput.classList.remove('pressedcolor')
-    }
+        }
+        if (id !== "choose"){
+            colorInput.classList.remove('pressedcolor');
+        }
 }
 
 resizeButton.addEventListener('click', ()=>{
@@ -272,52 +263,18 @@ resizeButton.addEventListener('click', ()=>{
 })
 
 randomButton.addEventListener('click', ()=>{
-    toggle()
     randomButton.classList.add('pressed');
+    toggle();
     clearButtons('randomize');
-    for (i=0;i<squares.length;i++){
-        squares[i].removeEventListener('mousemove',reduceOpacity); //stop hover erasing
-        squares[i].removeEventListener('mousedown',reduceOpacity); //stop click erasing
-        squares[i].removeEventListener('mousemove',paintWithSelected); //stop hover painting with picked color
-        squares[i].removeEventListener('mousedown',paintWithSelected); //stop click painting with picked color
-        if (document.getElementById("toggle").checked){//clickpaint
-            squares[i].removeEventListener('mousemove',increaseOpacity); //stop hover increasing opacity
-            squares[i].addEventListener('mousedown',increaseOpacityFaster); //start click increasing opacity
-            squares[i].addEventListener('mousedown',paintWithRandom); //start click random colors
-        }
-        else {//hoverpaint
-            squares[i].removeEventListener('mousedown',increaseOpacityFaster);//stop click increasing opacity
-            squares[i].addEventListener('mousemove',increaseOpacity);//start hover increasing opacity
-            squares[i].addEventListener('mousemove',paintWithRandom);//start hover random colors
-        }
-    }
 })
 
 let colorInput = document.getElementById("choose")
 
 function pickColor(){
-    toggle()
     colorInput.classList.add('pressedcolor');
     clearButtons('choose');
     colorInput.style.backgroundColor=`${colorInput.value}`
-    for (i=0;i<squares.length;i++){      
-        squares[i].removeEventListener('mousemove',reduceOpacity);   
-        squares[i].removeEventListener('mousedown',reduceOpacity);   
-        squares[i].removeEventListener('mousemove',paintWithRandom);
-        squares[i].removeEventListener('mousedown',paintWithRandom);
-        if (document.getElementById("toggle").checked){//clickpaint
-            squares[i].addEventListener('mousedown',increaseOpacityFaster);
-            squares[i].removeEventListener('mousemove',increaseOpacity);
-            squares[i].addEventListener('mousedown',paintWithSelected);
-            squares[i].removeEventListener('mousemove',paintWithSelected);
-        }
-        else {//hoverpaint
-            squares[i].addEventListener('mousemove',increaseOpacity);
-            squares[i].removeEventListener('mousedown',increaseOpacityFaster);
-            squares[i].addEventListener('mousemove',paintWithSelected);
-            squares[i].removeEventListener('mousedown',paintWithSelected);
-        }
-    }
+    toggle();
 }
 
 function paintWithRandom(e) {
@@ -347,20 +304,30 @@ function toggle() {
             for (i=0;i<squares.length;i++){
                 squares[i].addEventListener('mousedown',paintWithRandom);
                 squares[i].addEventListener('mousedown',increaseOpacityFaster);
+
+                squares[i].removeEventListener('mousedown',paintWithSelected);
+                squares[i].removeEventListener('mousedown',reduceOpacity);
             }
         }     
         else if (Array.from(eraseButton.classList).includes("pressed")){
             for (i=0;i<squares.length;i++){
                     squares[i].addEventListener('mousedown',reduceOpacity);
+
+                    squares[i].removeEventListener('mousedown',paintWithSelected);
+                    squares[i].removeEventListener('mousedown',increaseOpacityFaster); 
+                    squares[i].removeEventListener('mousedown',paintWithRandom);
             }
         }
         else if (Array.from(colorInput.classList).includes("pressedcolor")){
             for (i=0;i<squares.length;i++){
                     squares[i].addEventListener('mousedown',paintWithSelected);
                     squares[i].addEventListener('mousedown',increaseOpacityFaster);
+
+                    squares[i].removeEventListener('mousedown',reduceOpacity);
+                    squares[i].removeEventListener('mousedown',paintWithRandom);
             }
         }
-        else {
+        else {//default - if no option is selected, it increases the opacity, painting the grid black
             for (i=0;i<squares.length;i++){
                 squares[i].addEventListener('mousedown',increaseOpacityFaster);
             }
@@ -377,17 +344,27 @@ function toggle() {
             for (i=0;i<squares.length;i++){
                 squares[i].addEventListener('mousemove',paintWithRandom);
                 squares[i].addEventListener('mousemove',increaseOpacity);
+
+                squares[i].removeEventListener('mousemove',paintWithSelected);
+                squares[i].removeEventListener('mousemove',reduceOpacity);
             }
         }
         else if (Array.from(eraseButton.classList).includes("pressed")){
             for (i=0;i<squares.length;i++){
                 squares[i].addEventListener('mousemove',reduceOpacity);
+
+                squares[i].removeEventListener('mousemove',paintWithSelected);
+                squares[i].removeEventListener('mousemove',increaseOpacity); 
+                squares[i].removeEventListener('mousemove',paintWithRandom);
             }
         }
         else if (Array.from(colorInput.classList).includes("pressedcolor")){
             for (i=0;i<squares.length;i++){
                 squares[i].addEventListener('mousemove',paintWithSelected);
                 squares[i].addEventListener('mousemove',increaseOpacity);
+
+                squares[i].removeEventListener('mousemove',reduceOpacity);
+                squares[i].removeEventListener('mousemove',paintWithRandom);
             }
         }
         else {
@@ -396,33 +373,8 @@ function toggle() {
             }
         }
     }
-}//endfunc
-
-    
-
+}
 generateGrid()
-/*
-    if (document.getElementById("toggle").checked){
-
-    }
-    else {
-
-        }
-z tamtego:
- gridItems[i].addEventListener('mousedown', drawClick);
-    // listen for a mouse over and change colour only if mouse button is pressed
-    gridItems[i].addEventListener('mouseenter', drawClickHover);
-
-// draw on the grid when clicked
-function drawClick(e) {
-  // when fill or grab is true do not do anything (a seperate listener is waiting for fill / grab input)
-*/
-//to do:
-//remove all other listeners as a single function to stop repetition
-//improve mousedown
-//add comments throughout
-//readme
-
 </script>
 </body>
 
