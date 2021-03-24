@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
 <style>
@@ -66,8 +67,14 @@ input::-webkit-color-swatch {
     border:none;
     color:white;  
 }
-p{
+p, a{
     color:white;
+    font-size: 15px;
+    transition: all 0.5s ease-out;
+}
+
+a:hover{
+    color:rgb(197, 160, 104);
 }
 button {
     border-radius: 15px;
@@ -167,6 +174,7 @@ input:checked + .slider:before {
         <button class="buttonlabel">COLOR</button>
        <button id="hoverclick" class="buttonlabel">hover/click</button>
     </div>
+    <p>made by <a href="https://github.com/Hrexandro">Hrexandro</a> | <a href="https://github.com/Hrexandro/etch-a-sketch/blob/main/etch-a-sketch.html">Source</a></p>
 </div>
 <script>
 let squares = gridDiv.children
@@ -240,7 +248,7 @@ function clearButtons(id){//ensures only one button is active at a time, graphic
             buttons[i].classList.remove('pressed');
         }
         }
-        if (id !== "choose"){//graphics of the 'color' button work differently
+        if (id !== "choose"){//graphics of the 'color' button work a bit different
             colorInput.classList.remove('pressedcolor');
         }
 }
