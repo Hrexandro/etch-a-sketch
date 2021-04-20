@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
+<style>
+h1 {
+    font-family: 'Lobster';
+    font-size:38px;
+    color: rgb(197, 160, 104);
+}
+.square {
+    background-color:black;
+    opacity: 0;
+    border-image-width: 0;
+}
+body {
+    background-color:rgb(252, 252, 149);
+    text-align:center;
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items: center;
+}
+#mainDiv {
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+    align-items: center;    
+    width:1200px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color:rgb(160, 0, 0);
+    border-radius: 15px;
+}
+#gridDiv {
+    display: grid;
+    height:500px;
+    width:600px;
+    row-gap: 0px;
+    column-gap:0px;
+    box-sizing:initial;
+    background-color:white;
+}
+#buttons-one {
+    width:80%;
+    display:flex;
+    justify-content:space-between;
+    margin-top:35px;
+    align-items:center;
+}
+#buttons-two{
+    width:80%;
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:45px;
+    align-items:flex-start;   
+}
+input::-webkit-color-swatch {
+    border: none;
+}
+#choose{
+    outline:none;
+    border-radius: 15px;
+    width:130px;
+    height:30px;
+    background-color:black;
+    padding: 2px;
+    border:none;
+    color:white;  
+}
+p, a{
+    color:white;
+    font-size: 15px;
+    transition: all 0.5s ease-out;
+}
+
+a:hover{
+    color:rgb(197, 160, 104);
+}
+button {
+    border-radius: 15px;
+    width:130px;
+    height:30px;
+    outline:none;
+    border:none;
+    background-color:WHITE;
+    font-family: Chango;
+}
+#clear:active,#resize:active,.pressed{
+    box-shadow: inset 0px 0px 6px #0c0c0c,0px 0px 6px #0c0c0c;
+    background-color: #ffffff;
+}
+
+.pressedcolor {
+    box-shadow: 0px 0px 6px #0c0c0c;
+}
+.buttonlabel{
+ background-color: rgb(160, 0, 0); 
+ border:none;
+ color:white;
+ font-family: Chango;
+ font-size:18px;
+ width:130px;
+}
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 130px;
+  height: 30px;
+}
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgb(255, 255, 255);
+  transition: .4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 2px;
+  background-color: rgb(160, 0, 0);
+  transition: .4s;
+}
+input:checked + .slider:before {
+  transform: translateX(97px);
+}
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+.slider.round:before {
+  border-radius: 50%;
+}
+</style>
+<html>
+<head>
+    <title>Etch-a-Sketch</title>
+</head>
+<body>
+<div id="mainDiv">
+    <h1>Etch-A-Sketch</h1>
+    <div id="gridDiv"></div>
+    <div id="buttons-one">
+        <button class="realbutton" id="randomize"></button>
+        <button class="realbutton" id="clear"></button>
+        <button class="realbutton" id="resize"></button>
+        <button class="realbutton" id="erase"></button>
+        <input  type="color" id="choose">
+        <label class="switch">
+            <input id='toggle' type="checkbox">
+            <span class="slider round"></span>
+          </label>
+        </label>
+    </div>      
+    <div id="buttons-two">
+        <button class="buttonlabel">RANDOM</button>
+        <button class="buttonlabel">CLEAR</button>
+        <button class="buttonlabel">RESIZE</button>
+        <button class="buttonlabel">ERASE</button>
+        <button class="buttonlabel">COLOR</button>
+       <button id="hoverclick" class="buttonlabel">hover/click</button>
+    </div>
+    <p>made by <a href="https://github.com/Hrexandro">Hrexandro</a> | <a href="https://github.com/Hrexandro/etch-a-sketch/blob/main/etch-a-sketch.html">Source</a></p>
+</div>
+<script>
+let squares = gridDiv.children
+let clearButton = document.getElementById("clear");
+let randomButton = document.getElementById("randomize");
+let resizeButton = document.getElementById("resize");
+let eraseButton = document.getElementById("erase");
+let gridSide=16;
+let trigger = false;//the trigger ensures desired painting behavior, when toggle is set on hover, it is true by default
+//when toggle is set on click, it is true during mousedown, so the user can paint while dragging with pressed mouse button,
+//mousemove paints, but only when mousedown also happens, in other case, with only mousedown being set, it would be "1 click - 1 painted square"
+function generateGrid() {
+    for (i=0;i<squares.length;i++){
+        squares[i].style.opacity='0';
+        }
+    if (isNaN(gridSide)||!Number.isInteger(Number(gridSide))||gridSide<=0||gridSide>=100) {
+        alert("The number should be a positive integer lower than 100.")
+    }
+    else {
+        gridDiv.style.gridTemplateColumns=`repeat(${gridSide}, 1fr)`;
+        gridDiv.style.gridTemplateRows=`repeat(${gridSide}, 1fr)`;
+        for (i=0;i<gridSide*gridSide;i++){
+            let div = document.createElement('div');
+            document.getElementById('gridDiv').appendChild(div);
+        }
+        for (i=0;i<squares.length;i++){
+            squares[i].classList.add('square');
+        }
+        toggle();
+    }
+}
+function increaseOpacity (e) {
+    if (trigger){
+        if (event.target.style.opacity<1.5){//ensuring it doesn't increase to infinity
+            event.target.style.opacity=Number(event.target.style.opacity)+Number('0.15');
+        }
+    }
+}
+function increaseOpacityFaster (e) {
+    event.preventDefault();
+    if (trigger){
+            if (event.target.style.opacity<1.5){
+                event.target.style.opacity=Number(event.target.style.opacity)+Number('0.33');
+            }
+        }
+}
+function reduceOpacity (e){
+    event.preventDefault();
+    if (trigger){
+        if (event.target.style.opacity>-0.5){
+            event.target.style.opacity=Number(event.target.style.opacity)-Number('0.33');
+        }
+    }
+}
+clearButton.addEventListener('click', ()=>{//clears the grid of all color, retaining size
+    if (isNaN(gridSide)||!Number.isInteger(Number(gridSide))||gridSide<=0||gridSide>=100) {
+        gridSide=16;
+    }
+    generateGrid()
+})
+eraseButton.addEventListener('click',()=>{  
+    eraseButton.classList.add('pressed');
+    clearButtons('erase');
+    toggle();
+    
+})
+let buttons = document.getElementsByClassName('realbutton');
+function clearButtons(id){//ensures only one button is active at a time, graphically and functionally
+    for (i=0; i<buttons.length;i++){
+        if (buttons[i].getAttribute('id') !== `${id}`){//the id that is currently active does not get cleared
+            buttons[i].classList.remove('pressed');
+        }
+        }
+        if (id !== "choose"){//graphics of the 'color' button work a bit different
+            colorInput.classList.remove('pressedcolor');
+        }
+}
+resizeButton.addEventListener('click', ()=>{
+    gridSide = prompt("Set number of pixels per side.")
+    generateGrid()
+})
+randomButton.addEventListener('click', ()=>{
+    randomButton.classList.add('pressed');
+    toggle();
+    clearButtons('randomize');
+})
+let colorInput = document.getElementById("choose")
+function pickColor(){
+    colorInput.classList.add('pressedcolor');
+    clearButtons('choose');
+    colorInput.style.backgroundColor=`${colorInput.value}`
+    toggle();
+}
+function paintWithSelected(e) {//painting works through simultaneously changing the background color and increasing opacity from default white to the selected color
+    if (trigger){
+        event.target.style.backgroundColor=`${colorInput.value}`;
+    }
+}
+function paintWithRandom(e) {
+    if (trigger){
+        event.target.style.backgroundColor=`rgb(${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)})`
+    }
+}
+colorInput.addEventListener('input', ()=>{
+    pickColor();
+})
+document.getElementById("toggle").addEventListener ('click', toggle)
+
+function triggerOn(){
+    trigger = true;
+}
+function triggerOff(){
+    trigger = false;
+}
+function toggle() {//checks the settings on all the buttons and sets the events accordingly
+    if (document.getElementById("toggle").checked){//set on click
+        trigger = false;
+        document.addEventListener('mousedown', triggerOn);
+        document.addEventListener('mouseup', triggerOff);//only paint when mouse is pressed
+        for (i=0;i<squares.length;i++){
+            squares[i].removeEventListener('mousemove',increaseOpacity);
+        }
+        if (Array.from(randomButton.classList).includes("pressed")) {
+            for (i=0;i<squares.length;i++){
+                squares[i].addEventListener('mousemove',paintWithRandom);
+                squares[i].addEventListener('mousemove',increaseOpacityFaster);
+
+                squares[i].removeEventListener('mousemove',paintWithSelected);
+                squares[i].removeEventListener('mousemove',reduceOpacity);
+            }
+        }     
+        else if (Array.from(eraseButton.classList).includes("pressed")){
+            for (i=0;i<squares.length;i++){
+                    squares[i].addEventListener('mousemove',reduceOpacity);
+
+                    squares[i].removeEventListener('mousemove',paintWithSelected);
+                    squares[i].removeEventListener('mousemove',increaseOpacityFaster); 
+                    squares[i].removeEventListener('mousemove',paintWithRandom);
+            }
+        }
+        else if (Array.from(colorInput.classList).includes("pressedcolor")){
+            for (i=0;i<squares.length;i++){
+                    squares[i].addEventListener('mousemove',paintWithSelected);
+                    squares[i].addEventListener('mousemove',increaseOpacityFaster);
+
+                    squares[i].removeEventListener('mousemove',reduceOpacity);
+                    squares[i].removeEventListener('mousemove',paintWithRandom);
+            }
+        }
+        else {//default - if no option is selected, it increases the opacity, painting the grid black
+            for (i=0;i<squares.length;i++){
+                squares[i].addEventListener('mousemove',increaseOpacityFaster);
+            }
+        }
+    }   
+    else {//set on hover
+        document.removeEventListener('mousedown', triggerOn);
+        document.removeEventListener('mouseup', triggerOff);
+        trigger = true;//trigger is true, ensuring painting on each mousemove event
+        for (i=0;i<squares.length;i++){    
+            squares[i].removeEventListener('mousemove',increaseOpacityFaster); 
+        }
+        if (Array.from(randomButton.classList).includes("pressed")) {
+            for (i=0;i<squares.length;i++){
+                squares[i].addEventListener('mousemove',paintWithRandom);
+                squares[i].addEventListener('mousemove',increaseOpacity);
+
+                squares[i].removeEventListener('mousemove',paintWithSelected);
+                squares[i].removeEventListener('mousemove',reduceOpacity);
+            }
+        }
+        else if (Array.from(eraseButton.classList).includes("pressed")){
+            for (i=0;i<squares.length;i++){
+                squares[i].addEventListener('mousemove',reduceOpacity);
+
+                squares[i].removeEventListener('mousemove',paintWithSelected);
+                squares[i].removeEventListener('mousemove',increaseOpacity); 
+                squares[i].removeEventListener('mousemove',paintWithRandom);
+            }
+        }
+        else if (Array.from(colorInput.classList).includes("pressedcolor")){
+            for (i=0;i<squares.length;i++){
+                squares[i].addEventListener('mousemove',paintWithSelected);
+                squares[i].addEventListener('mousemove',increaseOpacity);
+
+                squares[i].removeEventListener('mousemove',reduceOpacity);
+                squares[i].removeEventListener('mousemove',paintWithRandom);
+            }
+        }
+        else {
+            for (i=0;i<squares.length;i++){
+                squares[i].addEventListener('mousemove',increaseOpacity);
+            }
+        }
+    }
+}
+generateGrid()//starting grid
+</script>
+</body>
+
+</html>
