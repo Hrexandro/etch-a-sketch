@@ -38,4 +38,4 @@ Assignment from the Odin project curriculum. ([link](https://www.theodinproject.
 
 - [w3schools toggle switch](https://www.w3schools.com/howto/howto_css_switch.asp)
 
-###### [click here](https://htmlpreview.github.io/?https://github.com/Hrexandro/etch-a-sketch/blob/main/etch-a-sketch.html) for a live preview!
+###### [click here](https://hrexandro.github.io/etch-a-sketch/) for a live preview!
