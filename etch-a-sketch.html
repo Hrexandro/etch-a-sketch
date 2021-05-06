@@ -246,7 +246,7 @@ function clearButtons(id){//ensures only one button is active at a time, graphic
     for (i=0; i<buttons.length;i++){
         if (buttons[i].getAttribute('id') !== `${id}`){//the id that is currently active does not get cleared
             buttons[i].classList.remove('pressed');
-        }
+            }
         }
         if (id !== "choose"){//graphics of the 'color' button work a bit different
             colorInput.classList.remove('pressedcolor');
