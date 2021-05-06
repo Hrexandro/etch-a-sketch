@@ -283,6 +283,31 @@ colorInput.addEventListener('input', ()=>{
 })
 document.getElementById("toggle").addEventListener ('click', toggle)
 
+///////////////////////////////////////////////////////////////////////////////////////
+
+//triggerless functions for painting with clicks
+function triggerlessPaintWithSelected(e) {
+    event.target.style.backgroundColor=`${colorInput.value}`;
+}
+function triggerlessPaintWithRandom(e) {
+    event.target.style.backgroundColor=`rgb(${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)},${Math.floor((Math.random() * 100) + 1)})`
+}
+
+function triggerlessIncreaseOpacityFaster (e) {
+    event.preventDefault();
+        if (event.target.style.opacity<1.5){
+            event.target.style.opacity=Number(event.target.style.opacity)+Number('0.33');
+        }
+}
+function triggerlessReduceOpacity (e){
+    event.preventDefault();
+    if (event.target.style.opacity>-0.5){
+        event.target.style.opacity=Number(event.target.style.opacity)-Number('0.33');
+    }
+
+}
+///////////////////////////////////////////////////////////////////////////////////////
+
 function triggerOn(){
     trigger = true;
 }
@@ -301,7 +326,12 @@ function toggle() {//checks the settings on all the buttons and sets the events 
             for (i=0;i<squares.length;i++){
                 squares[i].addEventListener('mousemove',paintWithRandom);
                 squares[i].addEventListener('mousemove',increaseOpacityFaster);
-
+///////////////////////////////////////////////////////////////////////////////////////
+                squares[i].addEventListener('click',triggerlessPaintWithRandom);
+                squares[i].addEventListener('click',triggerlessIncreaseOpacityFaster);
+                squares[i].removeEventListener('click',triggerlessPaintWithSelected);
+                squares[i].removeEventListener('click',triggerlessReduceOpacity);
+///////////////////////////////////////////////////////////////////////////////////////
                 squares[i].removeEventListener('mousemove',paintWithSelected);
                 squares[i].removeEventListener('mousemove',reduceOpacity);
             }
@@ -309,7 +339,12 @@ function toggle() {//checks the settings on all the buttons and sets the events 
         else if (Array.from(eraseButton.classList).includes("pressed")){
             for (i=0;i<squares.length;i++){
                     squares[i].addEventListener('mousemove',reduceOpacity);
-
+///////////////////////////////////////////////////////////////////////////////////////
+                    squares[i].addEventListener('click',rtriggerlessReduceOpacity);
+                    squares[i].removeEventListener('click',triggerlessPaintWithSelected);
+                    squares[i].removeEventListener('click',triggerlessIncreaseOpacityFaster); 
+                    squares[i].removeEventListener('click',triggerlessPaintWithRandom);
+///////////////////////////////////////////////////////////////////////////////////////
                     squares[i].removeEventListener('mousemove',paintWithSelected);
                     squares[i].removeEventListener('mousemove',increaseOpacityFaster); 
                     squares[i].removeEventListener('mousemove',paintWithRandom);
@@ -319,14 +354,23 @@ function toggle() {//checks the settings on all the buttons and sets the events 
             for (i=0;i<squares.length;i++){
                     squares[i].addEventListener('mousemove',paintWithSelected);
                     squares[i].addEventListener('mousemove',increaseOpacityFaster);
-
+///////////////////////////////////////////////////////////////////////////////////////
+                    squares[i].addEventListener('click',triggerlessPaintWithSelected);
+                    squares[i].addEventListener('click',triggerlessIncreaseOpacityFaster);
+                    squares[i].removeEventListener('click',triggerlessReduceOpacity);
+                    squares[i].removeEventListener('click',triggerlessPaintWithRandom);
+///////////////////////////////////////////////////////////////////////////////////////
                     squares[i].removeEventListener('mousemove',reduceOpacity);
                     squares[i].removeEventListener('mousemove',paintWithRandom);
             }
         }
         else {//default - if no option is selected, it increases the opacity, painting the grid black
             for (i=0;i<squares.length;i++){
+                ///////////////////////////////////////////////////////////////////////////////////////
+                squares[i].addEventListener('click',triggerlessIncreaseOpacityFaster);
+                ///////////////////////////////////////////////////////////////////////////////////////
                 squares[i].addEventListener('mousemove',increaseOpacityFaster);
+                
             }
         }
     }   
@@ -336,6 +380,14 @@ function toggle() {//checks the settings on all the buttons and sets the events 
         trigger = true;//trigger is true, ensuring painting on each mousemove event
         for (i=0;i<squares.length;i++){    
             squares[i].removeEventListener('mousemove',increaseOpacityFaster); 
+///////////////////////////////////////////////////////////////////////////////////////
+
+            squares[i].removeEventListener('click',triggerlessPaintWithSelected);
+            squares[i].removeEventListener('click',triggerlessIncreaseOpacityFaster); 
+            squares[i].removeEventListener('click',triggerlessPaintWithRandom);
+            squares[i].removeEventListener('click',triggerlessReduceOpacity);
+
+///////////////////////////////////////////////////////////////////////////////////////
         }
         if (Array.from(randomButton.classList).includes("pressed")) {
             for (i=0;i<squares.length;i++){
