@@ -340,7 +340,7 @@ function toggle() {//checks the settings on all the buttons and sets the events 
             for (i=0;i<squares.length;i++){
                     squares[i].addEventListener('mousemove',reduceOpacity);
 ///////////////////////////////////////////////////////////////////////////////////////
-                    squares[i].addEventListener('click',rtriggerlessReduceOpacity);
+                    squares[i].addEventListener('click',triggerlessReduceOpacity);
                     squares[i].removeEventListener('click',triggerlessPaintWithSelected);
                     squares[i].removeEventListener('click',triggerlessIncreaseOpacityFaster); 
                     squares[i].removeEventListener('click',triggerlessPaintWithRandom);
